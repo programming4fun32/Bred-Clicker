@@ -22,15 +22,15 @@
         <button id="bakerButton" onclick="buyInfo('baker')" style="background-color: #000000; color: #ffffff; width: 500; height: 50; position: absolute; left: 5; top: 50%; transform: translate(0, -50%) translate(0, -275px); border-radius: 10px 10px 0px 0px; font-size: 36;"></button>
         <div id="bakerArea" style="width: 500; height: 500; font-size: 50px; background-color: #f1f1f1; border-radius: 0px 0px 10px 10px; cursor: default; overflow: scroll; position: fixed; left: 5; top: 50%; transform: translate(0, -50%);"></div>
         <dialog id="bakerInfo" style="width: 500px; height: 300px; padding: 5;">
-            <div id="bakerInfoClose" onclick="document.getElementById('bakerInfo').close()" style="position: absolute; right: 0; top; 0; background-color: #ff0000; color: #ffffff; width: 25; height: 25; font-weight: 900; text-align: center; padding-top: 7; cursor: default;">X</div>
+            <div id="bakerInfoClose" onclick="document.getElementById('bakerInfo').close()" style="position: absolute; right: 0; top: 0; background-color: #ff0000; color: #ffffff; width: 25; height: 20; font-weight: 900; text-align: center; padding-top: 4; cursor: default; border-radius: 0px 0px 0px 10px;">X</div>
             <h2 id="bakerInfoName" style="font-size: 30; margin-bottom: 0;">FirstName LastName</h2>
             <label id="bakerInfoGender" style="font-size: 18; margin-top: 0;">Gender</label>
         </dialog>
         <dialog id="buyInfoD" style="width: 500px; height: 300px; padding: 5;">
-            <div id="buyInfoDClose" onclick="document.getElementById('buyInfoD').close()" style="position: absolute; right: 0; top; 0; background-color: #ff0000; color: #ffffff; width: 25; height: 25; font-weight: 900; text-align: center; padding-top: 7; cursor: default;">X</div>
+            <div id="buyInfoDClose" onclick="document.getElementById('buyInfoD').close()" style="position: absolute; right: 0; top: 0; background-color: #ff0000; color: #ffffff; width: 25; height: 20; font-weight: 900; text-align: center; padding-top: 4; cursor: default; border-radius: 0px 0px 0px 10px;">X</div>
             <h2 id="buyInfoTitleD" style="font-size: 30; margin-bottom: 0;">Are you sure you want to buy [item]?</h2>
             <label id="buyInfoDescriptionD" style="font-size: 18">(A) new [item] cost $[cost]; You currently have/do not have enough $. <span style="color: #ff0000;">([cost - money] needed)</span></label>
-            <button id="buyInfoConfirmD" style="font-size: 18; position: absolute; bottom: 25; left: 50%; transform: translate(-50%, 0)">Confirm</button>
+            <button id="buyInfoConfirmD" style="font-size: 18; position: absolute; bottom: 25; left: 50%; transform: translate(-50%, 0); background-color: #00e700; color: #ffffff; border-radius: 10px; width: 150px;">Confirm</button>
         </dialog>
         <script>
             var info = document.getElementById("info");
