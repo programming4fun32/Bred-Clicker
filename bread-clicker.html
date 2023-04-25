@@ -1,0 +1,347 @@
+<html>
+    <head>
+        <title>Bred Clicker</title>
+        <style>
+            * {
+                font-family: arial;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="info" style="position: fixed; background-color: #e8e8e8; border-radius: 10px; width: 150; height: 75; padding: 5; visibility: hidden">
+            <label id="infoName" style="font-size: 20;">Name</label><br>
+            <label id="infoRare" style="font-size: 20; color: #0000ff;">Advanced</label>
+        </div>
+        <div id="moneyI" style="font-size: 40px; text-align: center;"></div>
+        <div id="mpsI" style="font-size: 25px; text-align: center;"></div>
+        <div id="mpcI" style="font-size: 25px; text-align: center;"></div>
+        <div id="bred" style="position: fixed; width: 250; height: 250; left: 50%; top: 50%; background-image: url(bred.png); background-size: contain; background-repeat: no-repeat; transform: translate(-50%, -50%);"></div>
+        <button id="bakerButton" onclick="newBaker();"></button>
+        <button id="yeastButton" onclick="yeastUpgrade();"></button>
+        <label style="color: #ff0000">Not enough $</label>
+        <div id="bakerArea" style="width: 500; height: 500; font-size: 50px; background-color: #f1f1f1; border-radius: 10px; cursor: default; overflow: scroll;"></div>
+        <dialog id="bakerInfo" style="width: 500px; height: 300px; padding: 5;">
+            <div id="bakerInfoClose" onclick="document.getElementById('bakerInfo').close()" style="position: absolute; right: 0; top; 0; background-color: #ff0000; color: #ffffff; width: 25; height: 25; font-weight: 900; text-align: center; padding-top: 7; cursor: default;">X</div>
+            <h2 id="bakerInfoName" style="font-size: 30; margin-bottom: 0;">FirstName LastName</h2>
+            <label id="bakerInfoGender" style="font-size: 18; margin-top: 0;">Gender</label>
+        </dialog>
+        <script>
+            var info = document.getElementById("info");
+            var infoName = document.getElementById("infoName");
+            var infoRare = document.getElementById("infoRare");
+            var bred = document.getElementById("bred");
+            var moneyI = document.getElementById("moneyI");
+            var mpsI = document.getElementById("mpsI");
+            var mpcI = document.getElementById("mpcI");
+            var money = 0;
+            var mps = 0;
+            var mpc = 1;
+            var yeastType = 0;
+            var yeastCost = 100;
+            var bakerInfo = document.getElementById("bakerInfo");
+            var bakerInfoName = document.getElementById("bakerInfoName");
+            var bakerInfoGender = document.getElementById("bakerInfoGender");
+            var bakers = 0;
+            var bakerArea = document.getElementById("bakerArea");
+            var bakerCost = 100;
+            var womanBaker = "👩‍🍳";
+            var manBaker = "👨‍🍳";
+            var bakerButton = document.getElementById("bakerButton");
+            var yeastButton = document.getElementById("yeastButton");
+            const maleBakerNames = [
+                "Charles",
+                "Robert",
+                "Richard",
+                "Adam",
+                "Ethan",
+                "Corbin",
+                "Jameson",
+                "Cameron",
+                "Mason",
+                "Jack",
+                "John",
+                "Jon",
+                "Michael",
+                "Mike",
+                "Jason",
+                "Jackson",
+                "William",
+                "Henry",
+                "Walter",
+                "Jesse",
+                "Gustavo",
+                "Guy",
+                "Anthony",
+                "Alex",
+                "Max",
+                "Evan",
+                "Hunter",
+                "Johnathan",
+                "Nathan",
+                "Borris",
+                "Ben",
+                "Milton",
+                "Franklin",
+                "Brenton",
+                "Brent",
+                "Archer",
+                "Nolan",
+                "Noah",
+                "Wayne",
+                "Xander",
+                "Dylan",
+                "Andrew",
+            ];
+            const femaleBakerNames = [
+                "Jessica",
+                "Charlie",
+                "Ella",
+                "Becky",
+                "Carly",
+                "Kelly",
+                "Savannah",
+                "Ava",
+                "Avery",
+                "Celeste",
+                "Chesney",
+                "Jayden",
+                "Carol",
+                "Caroline",
+                "Jenifer",
+                "Amy",
+                "Amie",
+                "Keira",
+                "Isabella",
+                "Allie",
+                "Amelia",
+                "Emelia",
+            ];
+            const bakerSurnames = [
+                "Willams",
+                "Noah",
+                "Smith",
+                "Johnson",
+                "Tate",
+                "Brown",
+                "Jones",
+                "Garcia",
+                "Jackson",
+                "Jenkinson",
+                "Miller",
+                "Davis",
+                "Lopez",
+                "Wilson",
+                "Taylor",
+                "Thomas",
+                "Kranz",
+                "Moore",
+                "Martin",
+                "Lee",
+                "Lewis",
+                "Walker",
+                "Young",
+                "King",
+                "Hill",
+                "White",
+            ];
+            const yeast = [
+                "bad",
+                "bad",
+                "bad",
+                "bad",
+                "bad",
+                "okay",
+                "okay",
+                "okay",
+                "okay",
+                "okay",
+                "okay",
+                "okay",
+                "okay",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "good",
+                "great",
+                "great",
+                "great",
+                "great",
+                "great",
+                "normal",
+                "normal",
+                "normal",
+                "normal",
+                "normal",
+                "normal",
+                "normal",
+                "normal",
+                "normal",
+                "amazing",
+                "amazing",
+                "amazing",
+                "amazing",
+                "amazing",
+                "delicious",
+                "delicious",
+                "delicious",
+                "delicious",
+                "mouth-watering",
+                "mouth-watering",
+                "mouth-watering",
+                "mouth-watering",
+                "golden",
+                "golden",
+                "golden",
+                "golden",
+                "golden",
+                "top-notch",
+                "top-notch",
+                "top-notch",
+                "top-notch",
+                "super",
+                "super",
+                "super",
+            ];
+            
+            moneyI.innerHTML = "$" + money;
+            mpsI.innerHTML = "Money per second: $" + mps * mpc + " (" + bakers + " bakers)";
+            mpcI.innerHTML = "Money per click: $" + mpc + " (" + yeast[yeastType] + " yeast)";
+            bakerButton.innerHTML = "+1 Baker ($" + bakerCost + ")";
+            yeastButton.innerHTML = "Upgrade Yeast ($" + yeastCost + ")";
+
+            function getBakerInfo(element) {
+                bakerInfo.showModal();
+                bakerInfoName.innerHTML = getName(element);
+                if (element.innerHTML == womanBaker) {
+                    bakerInfoGender.innerHTML = "Female Baker";
+                } else if (element.innerHTML == manBaker) {
+                    bakerInfoGender.innerHTML = "Male Baker";
+                }
+                if (element.style.backgroundColor !== "") {
+                    if (element.innerHTML == womanBaker) {
+                        bakerInfoGender.innerHTML = "Advanced Female Baker";
+                    } else if (element.innerHTML == manBaker) {
+                        bakerInfoGender.innerHTML = "Advanced Male Baker";
+                    }
+                }
+            }
+            
+            function mpsInt() {
+                money += mps * mpc;
+                moneyI.innerHTML = "$" + money; 
+            }
+            
+            function click() {
+                money += mpc;
+                moneyI.innerHTML = "$" + money; 
+            }
+            
+            function getName(element) {
+                var Fname = element.getAttribute("data-Fname");
+                var Lname = element.getAttribute("data-Lname");
+                return Fname + " " + Lname;
+            }
+            
+            function updateBakerInfo(element) {
+                infoName.innerHTML = getName(element);
+                infoRare.style.visibility = "hidden";
+                if (element.style.backgroundColor !== "") {
+                    infoRare.style.visibility = "visible";
+                }
+            }
+            
+            function showInfo() {
+                info.style.visibility = "visible";
+            }
+            
+            function hideInfo() {
+                info.style.visibility = "hidden";
+                infoRare.style.visibility = "hidden";
+            }
+            
+            function newBaker() {
+                var Fname;
+                var LnameR = Math.floor(Math.random() * bakerSurnames.length);
+                var Lname = bakerSurnames[LnameR];
+                var gen = Math.floor(Math.random() * 2);
+                if (gen == 0) {
+                    var FnameR = Math.floor(Math.random() * femaleBakerNames.length);
+                    Fname = femaleBakerNames[FnameR];
+                } else {
+                    var FnameR = Math.floor(Math.random() * maleBakerNames.length);
+                    Fname = maleBakerNames[FnameR];
+                }
+                var rareBaker = Math.floor(Math.random() * 5);
+                if (rareBaker == 0) {
+                    if (gen == 0) {
+                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-Fname='" + Fname + "' data-Lname='" + Lname + "' style='background-color: #0000ff' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + womanBaker + "</span>";
+                    } else {
+                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-Fname='" + Fname + "' data-Lname='" + Lname + "' style='background-color: #0000ff' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + manBaker + "</span>";
+                    }
+                } else {
+                    if (gen == 0) {
+                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-Fname='" + Fname + "' data-Lname='" + Lname + "' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + womanBaker + "</span>";
+                    } else {
+                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-Fname='" + Fname + "' data-Lname='" + Lname + "' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + manBaker + "</span>";
+                    }
+                }
+                bakers += 1;
+                mps += 1;
+                if (rareBaker == 0) {
+                    mps += 1;
+                }
+                bakerCost = (bakerCost * 1.07) + 100;
+                bakerCost = Math.round(bakerCost);
+                mpsI.innerHTML = "Money per second: $" + mps * mpc + " (" + bakers + " bakers)";
+                bakerButton.innerHTML = "+1 Baker ($" + bakerCost + ")";
+            }
+            
+            function yeastUpgrade() {
+                yeastType += 1;
+                mpc += 1;
+                yeastCost = (yeastCost * 1.07) + 125;
+                yeastCost = Math.round(yeastCost);
+                mpcI.innerHTML = "Money per click: $" + mpc + " (" + yeast[yeastType] + " yeast)";
+                mpsI.innerHTML = "Money per second: $" + mps * mpc + " (" + bakers + " bakers)";
+                yeastButton.innerHTML = "Upgrade Yeast ($" + yeastCost + ")";
+            }
+            
+            document.addEventListener("mousemove", () => {
+                info.style.left = window.event.clientX + 10;
+                info.style.top = window.event.clientY + 8;
+                let infoWidth = parseInt(info.style.width);
+                let infoHeight = parseInt(info.style.height);
+                if (infoWidth + window.event.clientX + 20 > document.body.clientWidth) {
+                    info.style.left = window.event.clientX + 10 - 170;
+                }
+                if (infoHeight + window.event.clientY + 18 > document.body.clientHeight) {
+                    info.style.top = window.event.clientY + 8 - 80;
+                }
+            });
+            
+            bred.addEventListener("mouseenter", () => {
+                let bredBCR = bred.getBoundingClientRect()
+                bred.style.width = bredBCR.width + 25;
+                bred.style.height = bredBCR.height + 25;
+            });
+            
+            bred.addEventListener("mouseleave", () => {
+                let bredBCR = bred.getBoundingClientRect()
+                bred.style.width = bredBCR.width - 25;
+                bred.style.height = bredBCR.height - 25;
+            });
+            
+            bred.addEventListener("click", () => {
+                click();
+            });
+            
+            setInterval(mpsInt, 1000);
+        </script>
+    </body>
+</html>
