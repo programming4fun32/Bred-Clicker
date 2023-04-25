@@ -8,22 +8,29 @@
         </style>
     </head>
     <body>
-        <div id="info" style="position: fixed; background-color: #e8e8e8; border-radius: 10px; width: 150; height: 75; padding: 5; visibility: hidden">
+        <div id="info" style="position: fixed; background-color: #e8e8e8; border-radius: 10px; width: 150; height: 75; padding: 5; visibility: hidden; z-index: 1;">
             <label id="infoName" style="font-size: 20;">Name</label><br>
             <label id="infoRare" style="font-size: 20; color: #0000ff;">Advanced</label>
         </div>
-        <div id="moneyI" style="font-size: 40px; text-align: center;"></div>
-        <div id="mpsI" style="font-size: 25px; text-align: center;"></div>
-        <div id="mpcI" style="font-size: 25px; text-align: center;"></div>
+        <div style="position: fixed; left: 50%; top: 0; transform: translate(-50%, 0); background-color: #f1f1f1; width: 450; height: 125; border-radius: 0px 0px 10px 10px;">
+            <div id="moneyI" style="font-size: 40px; text-align: center;"></div>
+            <div id="mpsI" style="font-size: 25px; text-align: center;"></div>
+            <div id="mpcI" style="font-size: 25px; text-align: center;"></div>
+        </div>
         <div id="bred" style="position: fixed; width: 250; height: 250; left: 50%; top: 50%; background-image: url(bred.png); background-size: contain; background-repeat: no-repeat; transform: translate(-50%, -50%);"></div>
-        <button id="bakerButton" onclick="newBaker();"></button>
-        <button id="yeastButton" onclick="yeastUpgrade();"></button>
-        <label style="color: #ff0000">Not enough $</label>
-        <div id="bakerArea" style="width: 500; height: 500; font-size: 50px; background-color: #f1f1f1; border-radius: 10px; cursor: default; overflow: scroll;"></div>
+        <button id="yeastButton" onclick="buyInfo('yeast')" style="background-color: #000000; color: #ffffff; width: 500; height: 50; position: absolute; right: 5; top: 50%; transform: translate(0, -50%) translate(0, -275px); border-radius: 10px; font-size: 36;"></button>
+        <button id="bakerButton" onclick="buyInfo('baker')" style="background-color: #000000; color: #ffffff; width: 500; height: 50; position: absolute; left: 5; top: 50%; transform: translate(0, -50%) translate(0, -275px); border-radius: 10px 10px 0px 0px; font-size: 36;"></button>
+        <div id="bakerArea" style="width: 500; height: 500; font-size: 50px; background-color: #f1f1f1; border-radius: 0px 0px 10px 10px; cursor: default; overflow: scroll; position: fixed; left: 5; top: 50%; transform: translate(0, -50%);"></div>
         <dialog id="bakerInfo" style="width: 500px; height: 300px; padding: 5;">
             <div id="bakerInfoClose" onclick="document.getElementById('bakerInfo').close()" style="position: absolute; right: 0; top; 0; background-color: #ff0000; color: #ffffff; width: 25; height: 25; font-weight: 900; text-align: center; padding-top: 7; cursor: default;">X</div>
             <h2 id="bakerInfoName" style="font-size: 30; margin-bottom: 0;">FirstName LastName</h2>
             <label id="bakerInfoGender" style="font-size: 18; margin-top: 0;">Gender</label>
+        </dialog>
+        <dialog id="buyInfoD" style="width: 500px; height: 300px; padding: 5;">
+            <div id="buyInfoDClose" onclick="document.getElementById('buyInfoD').close()" style="position: absolute; right: 0; top; 0; background-color: #ff0000; color: #ffffff; width: 25; height: 25; font-weight: 900; text-align: center; padding-top: 7; cursor: default;">X</div>
+            <h2 id="buyInfoTitleD" style="font-size: 30; margin-bottom: 0;">Are you sure you want to buy [item]?</h2>
+            <label id="buyInfoDescriptionD" style="font-size: 18">(A) new [item] cost $[cost]; You currently have/do not have enough $. <span style="color: #ff0000;">([cost - money] needed)</span></label>
+            <button id="buyInfoConfirmD" style="font-size: 18; position: absolute; bottom: 25; left: 50%; transform: translate(-50%, 0)">Confirm</button>
         </dialog>
         <script>
             var info = document.getElementById("info");
@@ -35,19 +42,20 @@
             var mpcI = document.getElementById("mpcI");
             var money = 0;
             var mps = 0;
-            var mpc = 1;
+            var mpc = 5;
             var yeastType = 0;
-            var yeastCost = 100;
+            var yeastCost = 50;
             var bakerInfo = document.getElementById("bakerInfo");
             var bakerInfoName = document.getElementById("bakerInfoName");
             var bakerInfoGender = document.getElementById("bakerInfoGender");
             var bakers = 0;
             var bakerArea = document.getElementById("bakerArea");
-            var bakerCost = 100;
+            var bakerCost = 750;
             var womanBaker = "👩‍🍳";
             var manBaker = "👨‍🍳";
             var bakerButton = document.getElementById("bakerButton");
             var yeastButton = document.getElementById("yeastButton");
+            var buyType = "";
             const maleBakerNames = [
                 "Charles",
                 "Robert",
@@ -91,6 +99,9 @@
                 "Xander",
                 "Dylan",
                 "Andrew",
+                "Jacob",
+                "Brayden",
+                "Miles",
             ];
             const femaleBakerNames = [
                 "Jessica",
@@ -143,6 +154,8 @@
                 "King",
                 "Hill",
                 "White",
+                "Hunt",
+                "Benson",
             ];
             const yeast = [
                 "bad",
@@ -214,7 +227,50 @@
             mpcI.innerHTML = "Money per click: $" + mpc + " (" + yeast[yeastType] + " yeast)";
             bakerButton.innerHTML = "+1 Baker ($" + bakerCost + ")";
             yeastButton.innerHTML = "Upgrade Yeast ($" + yeastCost + ")";
-
+            
+            function purchasing() {
+                var buyInfoD = document.getElementById("buyInfoD");
+                if (buyType == "baker") {
+                    money -= bakerCost;
+                    newBaker();
+                    buyInfoD.close();
+                } else if (buyType == "yeast") {
+                    money -= yeastCost;
+                    yeastUpgrade();
+                    buyInfoD.close();
+                }
+            }
+            
+            function buyInfo(type) {
+                var buyInfoD = document.getElementById("buyInfoD");
+                var buyInfoTitleD = document.getElementById("buyInfoTitleD");
+                var buyInfoDescriptionD = document.getElementById("buyInfoDescriptionD");
+                var buyInfoConfirmD = document.getElementById("buyInfoConfirmD");
+                if (type == "baker") {
+                    buyInfoTitleD.innerHTML = "Are you sure you want to hire a baker?"
+                    if (money >= bakerCost) {
+                        buyInfoDescriptionD.innerHTML = "Hiring a baker cost $" + bakerCost + "; You currently have enough $."
+                        buyInfoConfirmD.disabled = null;
+                        buyType = "baker";
+                    } else {
+                        buyInfoDescriptionD.innerHTML = "Hiring a baker cost $" + bakerCost + "; You currently do not have enough $.<br><span style='color: #ff0000;'>($" + (bakerCost - money) + " needed)</span>"
+                        buyInfoConfirmD.disabled = "true";
+                    }
+                }
+                if (type == "yeast") {
+                    buyInfoTitleD.innerHTML = "Are you sure you want to upgrade your yeast?"
+                    if (money >= yeastCost) {
+                        buyInfoDescriptionD.innerHTML = "Upgrading yeast cost $" + yeastCost + "; You currently have enough $."
+                        buyInfoConfirmD.disabled = null;
+                        buyType = "yeast";
+                    } else {
+                        buyInfoDescriptionD.innerHTML = "Upgrading yeast cost $" + yeastCost + "; You currently do not have enough $.<br><span style='color: #ff0000;'>($" + (yeastCost - money) + " needed)</span>"
+                        buyInfoConfirmD.disabled = "true";
+                    }
+                }
+                buyInfoD.showModal();
+            }
+            
             function getBakerInfo(element) {
                 bakerInfo.showModal();
                 bakerInfoName.innerHTML = getName(element);
@@ -223,17 +279,27 @@
                 } else if (element.innerHTML == manBaker) {
                     bakerInfoGender.innerHTML = "Male Baker";
                 }
-                if (element.style.backgroundColor !== "") {
+                if (element.getAttribute("data-type") == "rare") {
                     if (element.innerHTML == womanBaker) {
                         bakerInfoGender.innerHTML = "Advanced Female Baker";
                     } else if (element.innerHTML == manBaker) {
                         bakerInfoGender.innerHTML = "Advanced Male Baker";
                     }
                 }
+                if (element.getAttribute("data-type") == "super") {
+                    if (element.innerHTML == womanBaker) {
+                        bakerInfoGender.innerHTML = "Super Female Baker";
+                    } else if (element.innerHTML == manBaker) {
+                        bakerInfoGender.innerHTML = "Super Male Baker";
+                    }
+                }
+                if (element.getAttribute("data-type") == "gordonRamsay") {
+                    bakerInfoGender.innerHTML = "The man himself.";
+                }
             }
             
             function mpsInt() {
-                money += mps * mpc;
+                money += mps;
                 moneyI.innerHTML = "$" + money; 
             }
             
@@ -251,8 +317,20 @@
             function updateBakerInfo(element) {
                 infoName.innerHTML = getName(element);
                 infoRare.style.visibility = "hidden";
-                if (element.style.backgroundColor !== "") {
+                if (element.getAttribute("data-type") == "rare") {
                     infoRare.style.visibility = "visible";
+                    infoRare.style.color = "#0000ff";
+                    infoRare.innerHTML = "Advanced"
+                }
+                if (element.getAttribute("data-type") == "super") {
+                    infoRare.style.visibility = "visible";
+                    infoRare.style.color = "#ff7f00";
+                    infoRare.innerHTML = "Super"
+                }
+                if (element.getAttribute("data-type") == "gordonRamsay") {
+                    infoRare.style.visibility = "visible";
+                    infoRare.style.color = "#000000";
+                    infoRare.innerHTML = "Insane"
                 }
             }
             
@@ -278,37 +356,54 @@
                     Fname = maleBakerNames[FnameR];
                 }
                 var rareBaker = Math.floor(Math.random() * 5);
-                if (rareBaker == 0) {
+                var superBaker = Math.floor(Math.random() * 10);
+                var gordonRamsayBaker = Math.floor(Math.random() * 50)
+                if (gordonRamsayBaker == 0) {
+                    bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-type='gordonRamsay' data-Fname='Gordon' data-Lname='Ramsay' style='background-color: #000000' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + manBaker + "</span>";
+                } else if (superBaker == 0) {
                     if (gen == 0) {
-                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-Fname='" + Fname + "' data-Lname='" + Lname + "' style='background-color: #0000ff' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + womanBaker + "</span>";
+                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-type='super' data-Fname='" + Fname + "' data-Lname='" + Lname + "' style='background-color: #ff7f00' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + womanBaker + "</span>";
                     } else {
-                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-Fname='" + Fname + "' data-Lname='" + Lname + "' style='background-color: #0000ff' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + manBaker + "</span>";
+                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-type='super' data-Fname='" + Fname + "' data-Lname='" + Lname + "' style='background-color: #ff7f00' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + manBaker + "</span>";
+                    }
+                } else if (rareBaker == 0) {
+                    if (gen == 0) {
+                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-type='rare' data-Fname='" + Fname + "' data-Lname='" + Lname + "' style='background-color: #0000ff' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + womanBaker + "</span>";
+                    } else {
+                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-type='rare' data-Fname='" + Fname + "' data-Lname='" + Lname + "' style='background-color: #0000ff' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + manBaker + "</span>";
                     }
                 } else {
                     if (gen == 0) {
-                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-Fname='" + Fname + "' data-Lname='" + Lname + "' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + womanBaker + "</span>";
+                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-type='normal' data-Fname='" + Fname + "' data-Lname='" + Lname + "' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + womanBaker + "</span>";
                     } else {
-                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-Fname='" + Fname + "' data-Lname='" + Lname + "' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + manBaker + "</span>";
+                        bakerArea.innerHTML += "<span id='baker" + bakers + "' class='baker' data-type='normal' data-Fname='" + Fname + "' data-Lname='" + Lname + "' onmouseover='updateBakerInfo(this); showInfo();' onmouseout='hideInfo();' onclick='getBakerInfo(this)'>" + manBaker + "</span>";
                     }
                 }
+                
                 bakers += 1;
                 mps += 1;
                 if (rareBaker == 0) {
                     mps += 1;
                 }
-                bakerCost = (bakerCost * 1.07) + 100;
+                if (superBaker == 0) {
+                    mps += 4;
+                }
+                if (gordonRamsayBaker == 0) {
+                    mps += 99;
+                }
+                bakerCost += 750;
                 bakerCost = Math.round(bakerCost);
-                mpsI.innerHTML = "Money per second: $" + mps * mpc + " (" + bakers + " bakers)";
+                mpsI.innerHTML = "Money per second: $" + mps * 10 + " (" + bakers + " bakers)";
                 bakerButton.innerHTML = "+1 Baker ($" + bakerCost + ")";
             }
             
             function yeastUpgrade() {
                 yeastType += 1;
-                mpc += 1;
-                yeastCost = (yeastCost * 1.07) + 125;
+                mpc += 5;
+                yeastCost = (yeastCost * 1.08) + 250;
                 yeastCost = Math.round(yeastCost);
                 mpcI.innerHTML = "Money per click: $" + mpc + " (" + yeast[yeastType] + " yeast)";
-                mpsI.innerHTML = "Money per second: $" + mps * mpc + " (" + bakers + " bakers)";
+                mpsI.innerHTML = "Money per second: $" + mps * 10 + " (" + bakers + " bakers)";
                 yeastButton.innerHTML = "Upgrade Yeast ($" + yeastCost + ")";
             }
             
@@ -341,7 +436,13 @@
                 click();
             });
             
-            setInterval(mpsInt, 1000);
+            var buyInfoConfirmD = document.getElementById("buyInfoConfirmD");
+            
+            buyInfoConfirmD.addEventListener("click", () => {
+                purchasing();
+            })
+            
+            setInterval(mpsInt, 100);
         </script>
     </body>
 </html>
