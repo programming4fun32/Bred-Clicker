@@ -5,6 +5,9 @@
             * {
                 font-family: arial;
             }
+            h1 h2 h3 p label {
+                color: #000000;
+            }
         </style>
     </head>
     <body>
@@ -18,9 +21,11 @@
             <div id="mpcI" style="font-size: 25px; text-align: center;"></div>
         </div>
         <div id="bred" style="position: fixed; width: 250; height: 250; left: 50%; top: 50%; background-image: url(bred.png); background-size: contain; background-repeat: no-repeat; transform: translate(-50%, -50%);"></div>
-        <button id="yeastButton" onclick="buyInfo('yeast')" style="background-color: #000000; color: #ffffff; width: 500; height: 50; position: absolute; right: 5; top: 50%; transform: translate(0, -50%) translate(0, -275px); border-radius: 10px; font-size: 36;"></button>
-        <button id="bakerButton" onclick="buyInfo('baker')" style="background-color: #000000; color: #ffffff; width: 500; height: 50; position: absolute; left: 5; top: 50%; transform: translate(0, -50%) translate(0, -275px); border-radius: 10px 10px 0px 0px; font-size: 36;"></button>
-        <div id="bakerArea" style="width: 500; height: 500; font-size: 50px; background-color: #f1f1f1; border-radius: 0px 0px 10px 10px; cursor: default; overflow: scroll; position: fixed; left: 5; top: 50%; transform: translate(0, -50%);"></div>
+        <div id="bredArea" style="position: fixed; width: 400; height: 500; left: 50%; top: 50%; transform: translate(-50%,-50%); pointer-events: none;"></div>
+        <button id="yeastButton" class="bbutton" onclick="buyInfo('yeast')" style="background-color: #000000; color: #ffffff; width: 30%; height: 50; position: absolute; right: 5; top: 50%; transform: translate(0, -50%) translate(0, -275px); border-radius: 10px; font-size: 36;"></button>
+        <button id="upBredButton" class="bbutton" onclick="buyInfo('bred')" style="background-color: #000000; color: #ffffff; width: 30%; height: 50; position: absolute; right: 5; top: 50%; transform: translate(0, -50%) translate(0, -220px); border-radius: 10px; font-size: 36;"></button>
+        <button id="bakerButton" class="bbutton" onclick="buyInfo('baker')" style="background-color: #000000; color: #ffffff; width: 30%; height: 50; position: absolute; left: 5; top: 50%; transform: translate(0, -50%) translate(0, -275px); border-radius: 10px 10px 0px 0px; font-size: 36;"></button>
+        <div id="bakerArea" style="width: 30%; height: 500; font-size: 50px; background-color: #f1f1f1; border-radius: 0px 0px 10px 10px; cursor: default; overflow: scroll; position: fixed; left: 5; top: 50%; transform: translate(0, -50%);"></div>
         <dialog id="bakerInfo" style="width: 500px; height: 300px; padding: 5;">
             <div id="bakerInfoClose" onclick="document.getElementById('bakerInfo').close()" style="position: absolute; right: 0; top: 0; background-color: #ff0000; color: #ffffff; width: 25; height: 20; font-weight: 900; text-align: center; padding-top: 4; cursor: default; border-radius: 0px 0px 0px 10px;">X</div>
             <h2 id="bakerInfoName" style="font-size: 30; margin-bottom: 0;">FirstName LastName</h2>
@@ -37,10 +42,15 @@
             var infoName = document.getElementById("infoName");
             var infoRare = document.getElementById("infoRare");
             var bred = document.getElementById("bred");
+            var currentBred = 0;
+            const breds = [
+                "🍞",
+                "🥖",
+            ]
             var moneyI = document.getElementById("moneyI");
             var mpsI = document.getElementById("mpsI");
             var mpcI = document.getElementById("mpcI");
-            var money = 0;
+            var money = 999995;
             var mps = 0;
             var mpc = 5;
             var yeastType = 0;
@@ -53,8 +63,11 @@
             var bakerCost = 750;
             var womanBaker = "👩‍🍳";
             var manBaker = "👨‍🍳";
+            var bredCost = 1000000;
+            var bredMulitplier = 1;
             var bakerButton = document.getElementById("bakerButton");
             var yeastButton = document.getElementById("yeastButton");
+            var upBredButton = document.getElementById("upBredButton");
             var buyType = "";
             const maleBakerNames = [
                 "Charles",
@@ -223,10 +236,11 @@
             ];
             
             moneyI.innerHTML = "$" + money;
-            mpsI.innerHTML = "Money per second: $" + mps * mpc + " (" + bakers + " bakers)";
-            mpcI.innerHTML = "Money per click: $" + mpc + " (" + yeast[yeastType] + " yeast)";
+            mpsI.innerHTML = "Money per second: $" + mps * mpc * bredMulitplier + " (" + bakers + " bakers)";
+            mpcI.innerHTML = "Money per click: $" + mpc * bredMulitplier + " (" + yeast[yeastType] + " yeast)";
             bakerButton.innerHTML = "+1 Baker ($" + bakerCost + ")";
             yeastButton.innerHTML = "Upgrade Yeast ($" + yeastCost + ")";
+            upBredButton.innerHTML = "Better Bred ($" + bredCost + ")";
             
             function purchasing() {
                 var buyInfoD = document.getElementById("buyInfoD");
@@ -238,6 +252,11 @@
                     money -= yeastCost;
                     yeastUpgrade();
                     buyInfoD.close();
+                } else if (buyType == "bred") {
+                    money -= bredCost;
+                    bredUpgrade();
+                    buyInfoD.close();
+                    alert("")
                 }
             }
             
@@ -265,6 +284,17 @@
                         buyType = "yeast";
                     } else {
                         buyInfoDescriptionD.innerHTML = "Upgrading yeast cost $" + yeastCost + "; You currently do not have enough $.<br><span style='color: #ff0000;'>($" + (yeastCost - money) + " needed)</span>"
+                        buyInfoConfirmD.disabled = "true";
+                    }
+                }
+                if (type == "bred") {
+                    buyInfoTitleD.innerHTML = "Are you sure you want to upgrade your bred?"
+                    if (money >= bredCost) {
+                        buyInfoDescriptionD.innerHTML = "Upgrading bred cost $" + bredCost + "; You currently have enough $."
+                        buyInfoConfirmD.disabled = null;
+                        buyType = "bred";
+                    } else {
+                        buyInfoDescriptionD.innerHTML = "Upgrading bred cost $" + bredCost + "; You currently do not have enough $.<br><span style='color: #ff0000;'>($" + (bredCost - money) + " needed)</span>"
                         buyInfoConfirmD.disabled = "true";
                     }
                 }
@@ -299,13 +329,34 @@
             }
             
             function mpsInt() {
-                money += mps;
+                money += mps * bredMulitplier;
                 moneyI.innerHTML = "$" + money; 
             }
-            
             function click() {
-                money += mpc;
+                var bredArea = document.getElementById("bredArea");
+                money += mpc * bredMulitplier;
                 moneyI.innerHTML = "$" + money; 
+                var div = document.createElement("div");
+                div.innerHTML = breds[currentBred];
+                div.style.width = "50";
+                div.style.height = "50";
+                div.style = "position: absolute; font-size: 48px;";
+                var leftR = Math.floor(Math.random() * (bredArea.getBoundingClientRect().width - 25));
+                var topR = Math.floor(Math.random() * (bredArea.getBoundingClientRect().height - 25));
+                div.style.left = leftR;
+                div.style.top = topR;
+                bredArea.appendChild(div);
+                var i = 1
+                let bredInterval = setInterval(() => {
+                    if (i >= 0) {
+                        div.style.color = "rgba(0, 0, 0, " + i + ")";
+                        i -= 0.01;
+                        div.style.top = parseInt(div.style.top) - 1;
+                    } else {
+                        clearInterval(bredInterval);
+                        div.remove()
+                    }
+                }, 10)
             }
             
             function getName(element) {
@@ -393,7 +444,7 @@
                 }
                 bakerCost += 750;
                 bakerCost = Math.round(bakerCost);
-                mpsI.innerHTML = "Money per second: $" + mps * 10 + " (" + bakers + " bakers)";
+                mpsI.innerHTML = "Money per second: $" + mps * 10 * bredMulitplier + " (" + bakers + " bakers)";
                 bakerButton.innerHTML = "+1 Baker ($" + bakerCost + ")";
             }
             
@@ -402,9 +453,24 @@
                 mpc += 5;
                 yeastCost = (yeastCost * 1.08) + 250;
                 yeastCost = Math.round(yeastCost);
-                mpcI.innerHTML = "Money per click: $" + mpc + " (" + yeast[yeastType] + " yeast)";
-                mpsI.innerHTML = "Money per second: $" + mps * 10 + " (" + bakers + " bakers)";
+                mpcI.innerHTML = "Money per click: $" + mpc * bredMulitplier + " (" + yeast[yeastType] + " yeast)";
+                mpsI.innerHTML = "Money per second: $" + mps * bredMulitplier * 10 + " (" + bakers + " bakers)";
                 yeastButton.innerHTML = "Upgrade Yeast ($" + yeastCost + ")";
+            }
+            
+            function bredUpgrade() {
+                if (currentBred == 0) {
+                    currentBred = 1;
+                    bred.style.backgroundImage = "url('baguette.png')"
+                } else {
+                    currentBred = 0;
+                    bred.style.backgroundImage = "url('bred.png')"
+                }
+                bredMulitplier += 1;
+                bredCost *= 2;
+                upBredButton.innerHTML = "Better Bread ($" + bredCost + ")";
+                mpcI.innerHTML = "Money per click: $" + (mpc * bredMulitplier) + " (" + yeast[yeastType] + " yeast)";
+                mpsI.innerHTML = "Money per second: $" + (mps * bredMulitplier * 10) + " (" + bakers + " bakers)";
             }
             
             document.addEventListener("mousemove", () => {
